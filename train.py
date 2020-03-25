@@ -12,7 +12,7 @@ from retinanet.dataloader import CocoDataset, CSVDataset, collater, Resizer, Asp
     Normalizer
 from torch.utils.data import DataLoader
 
-from retinanet import coco_eval
+# from retinanet import coco_eval
 from retinanet import csv_eval
 
 assert torch.__version__.split('.')[0] == '1'
@@ -28,6 +28,7 @@ def main(args=None):
     parser.add_argument('--csv_train', help='Path to file containing training annotations (see readme)')
     parser.add_argument('--csv_classes', help='Path to file containing class list (see readme)')
     parser.add_argument('--csv_val', help='Path to file containing validation annotations (optional, see readme)')
+    parser.add_argument('--model_path', help='Path to save model')
 
     parser.add_argument('--depth', help='Resnet depth, must be one of 18, 34, 50, 101, 152', type=int, default=50)
     parser.add_argument('--epochs', help='Number of epochs', type=int, default=100)
@@ -111,6 +112,8 @@ def main(args=None):
 
     print('Num training images: {}'.format(len(dataset_train)))
 
+    max_map = 0
+
     for epoch_num in range(parser.epochs):
 
         retinanet.train()
@@ -154,13 +157,12 @@ def main(args=None):
             except Exception as e:
                 print(e)
                 continue
-
+        mAP = 0
         if parser.dataset == 'coco':
 
             print('Evaluating dataset')
 
             coco_eval.evaluate_coco(dataset_val, retinanet)
-
         elif parser.dataset == 'csv' and parser.csv_val is not None:
 
             print('Evaluating dataset')
@@ -169,11 +171,12 @@ def main(args=None):
 
         scheduler.step(np.mean(epoch_loss))
 
-        torch.save(retinanet.module, '{}_retinanet_{}.pt'.format(parser.dataset, epoch_num))
+        if mAP > max_map:
+            torch.save(retinanet.module, '{}_retinanet_{}.pt'.format(parser.dataset, epoch_num))
 
     retinanet.eval()
 
-    torch.save(retinanet, 'model_final.pt')
+    # torch.save(retinanet, 'model_final.pt')
 
 
 if __name__ == '__main__':
