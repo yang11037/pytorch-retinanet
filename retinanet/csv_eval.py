@@ -232,7 +232,6 @@ def evaluate(
         average_precision  = _compute_ap(recall, precision)
         average_precisions[label] = average_precision, num_annotations
     
-    print('\nmAP:')
     recalls = np.asarray(recall)
     precisions = np.asarray(precision)
     add = recalls + precisions
@@ -241,6 +240,7 @@ def evaluate(
     print(recalls[index])
     print("precision:")
     print(precisions[index])
+    print('\nmAP:')
     for label in range(generator.num_classes()):
         label_name = generator.label_to_name(label)
         print('{}: {}'.format(label_name, average_precisions[label][0]))

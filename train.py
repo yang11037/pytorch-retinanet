@@ -31,7 +31,7 @@ def main(args=None):
     parser.add_argument('--model_path', help='Path to save model')
 
     parser.add_argument('--depth', help='Resnet depth, must be one of 18, 34, 50, 101, 152', type=int, default=50)
-    parser.add_argument('--epochs', help='Number of epochs', type=int, default=100)
+    parser.add_argument('--epochs', help='Number of epochs', type=int, default=50)
 
     parser = parser.parse_args(args)
 
@@ -171,7 +171,7 @@ def main(args=None):
 
         scheduler.step(np.mean(epoch_loss))
 
-        if mAP > max_map:
+        if mAP["nodule"] > max_map:
             torch.save(retinanet.module, '{}_retinanet_{}.pt'.format(parser.model_path, epoch_num))
 
     retinanet.eval()
