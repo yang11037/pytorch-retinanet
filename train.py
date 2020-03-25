@@ -171,7 +171,7 @@ def main(args=None):
 
         scheduler.step(np.mean(epoch_loss))
 
-        if mAP["nodule"] > max_map:
+        if mAP[0][0] > max_map:
             torch.save(retinanet.module, '{}_retinanet_{}.pt'.format(parser.model_path, epoch_num))
 
     retinanet.eval()
